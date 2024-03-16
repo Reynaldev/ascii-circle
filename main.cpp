@@ -10,6 +10,20 @@
 
 char grid[GRID_SIZE][GRID_SIZE];
 
+void printHelp()
+{
+    printf(
+        "Usage:\n\t./a.exe [r] [arg]\n"
+        "Example:\n\t./a.exe 10 o\n"
+        "Arguments:\n"
+        "\td\tDraw donut\n"
+        "\tf\tDraw filled circle\n"
+        "\to\tDraw outlined circle\n"
+        "\n"
+        "\thelp\tShow help\n"
+    );
+}
+
 void drawCircleOutline(int radius)
 {
     for (int i = 0; i < 360; i++)
@@ -26,42 +40,89 @@ void drawCircleFill(int radius)
 {
     for (int i = 0; i <= 180; i++)
     {
-        float fR = (float) (i * PI / 180);              // Degree to Radian
-        float eR = (float) ((360 - i) * PI / 180);      // Opposite value
+        float fr = (float) (i * PI / 180);              // Degree to Radian
+        float er = (float) ((360 - i) * PI / 180);      // Opposite value
 
-        int fx = round((sin(fR) * radius) + OFFSET);
-        int fy = round((cos(fR) * radius) + OFFSET);
+        int fx = round((sin(fr) * radius) + OFFSET);
+        int fy = round((cos(fr) * radius) + OFFSET);
 
-        int ex = round((sin(eR) * radius) + OFFSET);
+        int ex = round((sin(er) * radius) + OFFSET);
 
         grid[fy][fx] = 'O';
 
         for (int j = fx; j > ex; j--)
-        {
             grid[fy][j] = 'O';
+    }
+}
+
+void drawDonut(int radius)
+{
+    int inRadius = 2;
+    for (int i = 0; i < 180; i++)
+    {
+        float fr = (float)(i * PI / 180);
+
+        // Outer line
+        int ox = round((sin(fr) * radius) + OFFSET);
+        int oy = round((cos(fr) * radius) + OFFSET);
+
+        // Inner line
+        int ix = round((sin(fr) * inRadius) + OFFSET);
+        int iy = round((cos(fr) * inRadius) + OFFSET);
+
+        float er = (float)((360 - i) * PI / 180);
+
+        int eox = round((sin(er) * radius) + OFFSET);
+        int eoy = round((cos(er) * radius) + OFFSET);
+
+        int eix = round((sin(er) * inRadius) + OFFSET);
+        int eiy = round((cos(er) * inRadius) + OFFSET);
+
+        grid[oy][ox] = 'O';
+        grid[iy][ix] = '|';
+        // grid[eoy][eox] = 'O';
+        // grid[eiy][eix] = 'O';
+
+        for (int j = ox; j > eox; j--)
+        {
+            if ((j < ix) && (j > eix))
+                grid[oy][j] = 'A';
+            else
+                grid[oy][j] = 'O';
         }
     }
-    
 }
 
 int main(int argc, char **argv)
 {
     memset(grid, ' ', sizeof(grid));
 
-    int radius = (argc == 2) ? atoi((char*)argv[1]) : 5;
-    char type[8];
+    if (!strcmp(*(argv + 1), "help"))
+    {
+        printHelp();
+        return 0;
+    }
 
-    memset(type, 0, sizeof(type));
+    int radius = (argc >= 2) ? atoi(*(argv + 1)) : 5;
+    char type;
 
-    if (argc == 3)
-        strcpy(type, argv[2]);
+    if (argc >= 3)
+        type = **(argv + 2);
     else
-        strcpy(type, "Outline");
+        type = 'o';
 
-    if (!strcmp(type, "Fill"))
-        drawCircleFill(radius);
-    else if (!strcmp(type, "Outline"))
-        drawCircleOutline(radius);
+    switch (type)
+    {
+        case 100:   // d
+            drawDonut(radius);
+            break;
+        case 102:   // f
+            drawCircleFill(radius);
+            break;
+        case 111:   // o
+            drawCircleOutline(radius);
+            break;
+    }
 
     // Draw
     for (int i = 0; i < GRID_SIZE; i++)
