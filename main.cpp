@@ -19,7 +19,9 @@ void printHelp()
         "\td\tDraw donut\n"
         "\tf\tDraw filled circle\n"
         "\to\tDraw outlined circle\n"
+        "\tp\tDraw circle per points\n"
         "\n"
+        "\tr\tAmount of radius/points\n"
         "\thelp\tShow help\n"
     );
 }
@@ -93,6 +95,19 @@ void drawDonut(int radius)
     }
 }
 
+void drawCirclePoint(int points)
+{
+    int step = 360 / points;
+    for (int i = 0; i <= 360; i += step)
+    {
+        float angle = (float)((i * PI) / 180);
+        int x = round((cos(angle) * 8) + OFFSET);
+        int y = round((sin(angle) * 8) + OFFSET);
+
+        grid[y][x] = 'O';
+    }
+}
+
 int main(int argc, char **argv)
 {
     memset(grid, ' ', sizeof(grid));
@@ -103,7 +118,7 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    int radius = (argc >= 2) ? atoi(*(argv + 1)) : 5;
+    int r = (argc >= 2) ? atoi(*(argv + 1)) : 5;
     char type;
 
     if (argc >= 3)
@@ -114,13 +129,16 @@ int main(int argc, char **argv)
     switch (type)
     {
         case 100:   // d
-            drawDonut(radius);
+            drawDonut(r);
             break;
         case 102:   // f
-            drawCircleFill(radius);
+            drawCircleFill(r);
             break;
         case 111:   // o
-            drawCircleOutline(radius);
+            drawCircleOutline(r);
+            break;
+        case 112:   // p
+            drawCirclePoint(r);
             break;
     }
 
